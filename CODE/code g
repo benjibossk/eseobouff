@@ -1,0 +1,90 @@
+#include <SPI.h>
+#include <RFID.h>
+
+#include <Keypad.h>
+
+//--- Constantes utilisées avec le clavier 4x4
+const byte LIGNES = 4; // 4 lignes
+const byte COLONNES = 4; //4 colonnes
+
+const int C4=2; 
+const int C3=3;
+const int C2=4; 
+const int C1=5;
+const int L4=16; 
+const int L3=17;
+const int L2=18;  
+const int L1=19;  
+
+//--- Définition des touches 
+char touches[LIGNES][COLONNES] = {
+  {'1','2','3','A'},
+  {'4','5','6','B'},
+  {'7','8','9','C'},
+  {'*','0','#','D'}
+};
+
+// tableaux de lignes et colonnes
+byte BrochesLignes[LIGNES] = {L1, L2, L3, L4}; 
+byte BrochesColonnes[COLONNES] = {C1, C2, C3, C4}; 
+
+char touche; 
+
+
+
+
+RFID monModuleRFID(10,9);
+int produit;
+int prix[10]={1,2,1,1,3,2,1,1,2,2};
+int UID[5]={};
+int CARTE[30][5]={{136,4,82,47,241},
+                 {168,5,72,56,357}};
+char prenom[2]={"Benjamin","Paulin"};
+int fric[10]={10,25};
+void setup()
+{
+  Serial.begin(9600);
+  SPI.begin();
+  monModuleRFID.init();  
+  
+
+}
+
+void loop()
+{
+  for (int j=0;j<2;j++){
+      if (monModuleRFID.isCard()) {  
+            if (monModuleRFID.readCardSerial()) {        
+              Serial.print("L'UID est: ");
+              for(int i=0;i<=4;i++)
+              {
+                UID[i]=monModuleRFID.serNum[i];
+                Serial.print(UID[i],DEC);
+               Serial.print(".");
+              }
+              Serial.println("");
+            }
+          
+            if (UID[0] == CARTE[j][0]
+            && UID[1] == CARTE[j][1]
+            && UID[2] == CARTE[j][2]
+            && UID[3] == CARTE[j][3]
+            && UID[4] == CARTE[j][4])
+            {
+                Serial.println("yo",prenom[j]);
+                Serial.println("Quelle produit voulez vous ?");
+                produit = clavier.getKey();
+                if prix[produit]==fric[j]{
+                  //faire tomber produit
+                }
+                
+           }
+            else
+             {
+                Serial.println("nop");
+           }          
+            monModuleRFID.halt();
+     }
+}
+    delay(1);    
+}
